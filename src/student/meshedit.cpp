@@ -541,12 +541,91 @@ std::optional<Halfedge_Mesh::VertexRef> Halfedge_Mesh::extrude_vertex(VertexRef 
     implement!)
 */
 std::optional<Halfedge_Mesh::FaceRef> Halfedge_Mesh::bevel_vertex(Halfedge_Mesh::VertexRef v) {
+    
+    int deg = v->degree();
+    if(deg < 3 || v->on_boundary()) return std::nullopt;
 
+    FaceRef bevface = new_face();
+    HalfedgeRef itrh = v->halfedge();
+
+    // get outgoing halfedges from original vertex
+
+    std::vector<HalfedgeRef> itrh_vec;
+    for(int i = 0; i < deg; i++) {
+        itrh_vec.push_back(itrh);
+        itrh = itrh->twin()->next();
+    }
+
+    // for each face neighbor to the new beveled face:
+
+    for(int i = 0; i < deg; i++) {
+
+        // creating new elements
+        VertexRef vi = new_vertex();
+        EdgeRef ei = new_edge();
+        HalfedgeRef hin = new_halfedge();
+        HalfedgeRef hout = new_halfedge();
+
+        // getting face and preh
+        FaceRef fout = itrh_vec[i]->face();
+
+        HalfedgeRef preh = itrh_vec[i];
+        do {
+            preh = preh->next();
+        } while(preh->next() != itrh_vec[i]);
+
+        // reassignment
+        hout->face() = fout;
+        hin->face() = bevface;
+        
+        ei->halfedge() = hout;
+        
+        hin->edge() = ei;
+        hout->edge() = ei;
+        
+        hin->vertex() = vi;
+        itrh_vec[i]->vertex() = vi;
+
+        // this is implemented in the next loop due to dependency 
+        /// hout->vertex()
+        
+        vi->halfedge() = itrh_vec[i];
+        
+        hin->twin() = hout;
+        hout->twin() = hin;
+        
+        preh->next() = hout;
+        hout->next() = itrh_vec[i];
+
+        // this is implemented in the next loop due to dependency 
+        /// hin->next();
+        
+        //positions:
+        vi->pos = v->pos;
+        
+    }
+
+    for(int i = 0; i < deg; i++) {
+
+        itrh_vec[i]->twin()->next()->vertex() = itrh_vec[i]->vertex();
+        
+        HalfedgeRef preh = itrh_vec[i];
+        do {
+            preh = preh->next();
+        } while(preh->next() != itrh_vec[i]);
+        itrh_vec[i]->twin()->next()->twin()->next() = preh->twin(); 
+        
+    }
+
+    bevface->halfedge() = itrh_vec[0]->twin()->next()->twin();
+
+    // erasing original vertex
+    erase(v);
+
+    return bevface;
     // Reminder: You should set the positions of new vertices (v->pos) to be exactly
     // the same as wherever they "started from."
 
-    (void)v;
-    return std::nullopt;
 }
 
 /*
@@ -603,11 +682,18 @@ void Halfedge_Mesh::bevel_vertex_positions(const std::vector<Vec3>& start_positi
         new_halfedges.push_back(h);
         h = h->next();
     } while(h != face->halfedge());
+    
+    // make sure vertex beveling is contained inside edges (and not flipped too)
+    if(tangent_offset < 0) tangent_offset = -tangent_offset;
+    if(tangent_offset > 1) tangent_offset = 1;
 
-    (void)new_halfedges;
-    (void)start_positions;
-    (void)face;
-    (void)tangent_offset;
+
+    for(int i = 0; i < new_halfedges.size(); i++) {
+        // simple linear interpolation
+        new_halfedges[i]->vertex()->pos =
+            tangent_offset * (new_halfedges[i]->twin()->next()->edge()->center()) +
+            (1 - tangent_offset) * start_positions[i];
+    }
 }
 
 /*
