@@ -223,6 +223,9 @@ std::optional<Halfedge_Mesh::VertexRef> Halfedge_Mesh::collapse_edge(Halfedge_Me
     HalfedgeRef h = e->halfedge();
     HalfedgeRef ht = h->twin();
 
+    int degh = h->face()->degree();
+    int deght = ht->face()->degree();
+
     HalfedgeRef nexh = h->next();
     HalfedgeRef nexht = ht->next();
 
@@ -232,6 +235,9 @@ std::optional<Halfedge_Mesh::VertexRef> Halfedge_Mesh::collapse_edge(Halfedge_Me
     VertexRef v_to_delete = ht->vertex();
 
     HalfedgeRef itrht = ht->twin()->next();
+
+    Vec3 vpos = (h->vertex()->pos + ht->vertex()->pos) / 2;
+
 
     do {
         preht = preht->next();
@@ -248,20 +254,52 @@ std::optional<Halfedge_Mesh::VertexRef> Halfedge_Mesh::collapse_edge(Halfedge_Me
         itrht = itrht->twin()->next();
     }
 
-    h->vertex()->halfedge() = nexh;
+    h->vertex()->halfedge() = nexh->twin()->next();
     h->face()->halfedge() = nexh;
 
 
-    ht->vertex()->halfedge() = nexht;
+    ht->vertex()->halfedge() = nexht->twin()->next();
     ht->face()->halfedge() = nexht;
 
     preh->next() = nexh;
     preht->next() = nexht;
 
+    if(degh <= 3)
+    {
+        preh->vertex()->halfedge() = nexh->twin();
+        preh->edge()->halfedge() = preh->twin();
+        nexh->twin()->edge() = preh->edge();
+
+        nexh->twin()->twin() = preh->twin();
+        preh->twin()->twin() = nexh->twin();
+
+        erase(nexh->edge());
+        erase(nexh);
+        erase(preh);
+        erase(h->face());
+    }
+    if(deght <= 3) {
+        preht->vertex()->halfedge() = nexht->twin();
+        preht->twin()->edge() = nexht->edge();
+        nexht->edge()->halfedge() = nexht->twin();
+
+
+        nexht->twin()->twin() = preht->twin();
+        preht->twin()->twin() = nexht->twin();
+
+        erase(preht->edge());
+        erase(nexht);
+        erase(preht);
+        erase(ht->face()); 
+    }
+
+    h->vertex()->pos = vpos;
+
     erase(v_to_delete);
     erase(h);
     erase(ht);
     erase(e);
+
 
     return h->vertex();
 }
@@ -272,8 +310,23 @@ std::optional<Halfedge_Mesh::VertexRef> Halfedge_Mesh::collapse_edge(Halfedge_Me
 */
 std::optional<Halfedge_Mesh::VertexRef> Halfedge_Mesh::collapse_face(Halfedge_Mesh::FaceRef f) {
 
-    (void)f;
-    return std::nullopt;
+    if(f->is_boundary()) return std::nullopt;
+
+    Vec3 c = f->center();
+
+    while(f->degree() > 3) {
+        collapse_edge(f->halfedge()->edge());
+    }
+
+    HalfedgeRef h_last = f->halfedge()->next()->twin();
+
+    collapse_edge(f->halfedge()->edge());
+    VertexRef v = collapse_edge(h_last->edge()).value();
+
+    v->pos = c;
+
+    return v;
+    
 }
 
 /*
@@ -467,7 +520,7 @@ std::optional<Halfedge_Mesh::VertexRef> Halfedge_Mesh::extrude_vertex(VertexRef 
 
     This is where bevel_vertex_positions, bevel_edge_positions, and
     bevel_face_positions come in: these functions are called repeatedly as you
-    move your mouse, the position of which determins the normal and tangent offset
+    move your mouse, the position of which determines the normal and tangent offset
     parameters. These functions are also passed an array of the original vertex
     positions: for bevel_vertex, it has one element, the original vertex position,
     for bevel_edge, two for the two vertices, and for bevel_face, it has the original
