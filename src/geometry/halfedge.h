@@ -315,6 +315,11 @@ public:
     void triangulate();
 
     /*
+        triangulates a face if it has > 3 degree
+    */
+    void triangulate(FaceRef face);
+
+    /*
         Compute new vertex positions for a mesh that splits each polygon
         into quads (by inserting a vertex at the face midpoint and each
         of the edge midpoints).  The new vertex positions will be stored

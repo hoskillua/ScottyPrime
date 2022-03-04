@@ -789,11 +789,102 @@ void Halfedge_Mesh::extrude_vertex_position(const Vec3& start_positions,
     Splits all non-triangular faces into triangles.
 */
 void Halfedge_Mesh::triangulate() {
-
+    
     // For each face...
+    std::unordered_map<int, bool> visited;
+    std::queue<FaceRef> faces_bfs;
+
+    faces_bfs.push(faces.begin());
+    visited[faces.begin()->id()] = true;
+    while(!faces_bfs.empty()) {
+        FaceRef u = faces_bfs.front();
+        faces_bfs.pop();
+
+        if(u->degree() > 3) triangulate(u);
+
+        HalfedgeRef h = u->halfedge();
+        do {
+            if(!visited[h->twin()->face()->id()]) {
+                faces_bfs.push(h->twin()->face());
+                visited[h->twin()->face()->id()] = true;
+            }
+            h = h->next();
+        } while(h != u->halfedge());
+    }
 }
 
-/* Note on the quad subdivision process:
+/*
+    triangulates a face if it has > 3 degree
+    zig-zag pattern
+*/
+void Halfedge_Mesh::triangulate(Halfedge_Mesh::FaceRef f) {
+    std::vector<HalfedgeRef> he_order;
+
+    HalfedgeRef itrh = f->halfedge();
+
+    for(size_t i = 0; i < f->degree(); i++) {
+        he_order.push_back(itrh);
+        itrh = itrh->next();
+    }
+
+    // use 2 pointers to implement zig-zag pattern;
+    size_t pointer1 = 1;
+    size_t pointer2 = he_order.size() - 1;
+
+    size_t direction = 1;
+    FaceRef fi = f;
+
+    while(pointer2 - pointer1 > 1) {
+        
+        EdgeRef ei = new_edge();
+        HalfedgeRef hin = new_halfedge();
+        HalfedgeRef hout = new_halfedge();
+        ei->is_new = true;
+
+        hout->face() = fi;
+        
+        fi = new_face();
+        
+        fi->halfedge() = hin;
+        he_order[pointer1]->face() = fi;
+        he_order[pointer2 - 1]->face() = fi;
+        hin->face() = fi;        
+
+        ei->halfedge() = hin;
+
+        hin->edge() = ei;
+        hout->edge() = ei;
+        
+        hout->vertex() = he_order[pointer1]->vertex();
+        
+        hin->vertex() = he_order[pointer2]->vertex();
+        
+        he_order[pointer1 - 1]->next() = hout;
+        hout->next() = he_order[pointer2];
+        hin->next() = he_order[pointer1];
+        he_order[pointer2 - 1]->next() = hin;
+        
+        hin->twin() = hout;
+        hout->twin() = hin;
+        
+        if (direction)
+            he_order[pointer2] = hin;
+        else 
+            he_order[pointer1-1] = hin;
+        
+
+        // this makes the pattern go like
+        // 1, n-1 
+        // 2, n-1 (+1,0)
+        // 2, n-2 (0,-1)
+        // 3, n-2 (+1,0)
+        pointer1 += (size_t)direction;
+        pointer2 -= (1 - (size_t)direction);
+        direction = (1-direction);
+    }
+}
+
+    /* Note on the quad subdivision process:
 
         Unlike the local mesh operations (like bevel or edge flip), we will perform
         subdivision by splitting *all* faces into quads "simultaneously."  Rather
