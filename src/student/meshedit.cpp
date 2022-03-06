@@ -490,8 +490,12 @@ std::optional<Halfedge_Mesh::VertexRef> Halfedge_Mesh::split_edge(Halfedge_Mesh:
    vertex
 */
 std::optional<Halfedge_Mesh::VertexRef> Halfedge_Mesh::inset_vertex(FaceRef f) {
-    (void)f;
-    return std::nullopt;
+    if(f->boundary) return std::nullopt;
+
+    f = bevel_face(f).value();
+
+    return collapse_face(f);
+
 }
 
 /*
@@ -499,9 +503,18 @@ std::optional<Halfedge_Mesh::VertexRef> Halfedge_Mesh::inset_vertex(FaceRef f) {
 */
 std::optional<Halfedge_Mesh::FaceRef> Halfedge_Mesh::inset_face(Halfedge_Mesh::FaceRef f) {
 
+    f = bevel_face(f).value();
+
+    Vec3 center = f->center();
+
+    auto h = f->halfedge();
+    do {
+        h->vertex()->pos = (h->vertex()->pos + center) / 2.0f;
+        h = h->next();
+    } while(h != f->halfedge());
+
+    return f;
     // hint: use bevel_face positions as a helper function here
-    (void)f;
-    return std::nullopt;
 }
 
 /*
@@ -509,8 +522,17 @@ std::optional<Halfedge_Mesh::FaceRef> Halfedge_Mesh::inset_face(Halfedge_Mesh::F
    to that vertex
 */
 std::optional<Halfedge_Mesh::VertexRef> Halfedge_Mesh::extrude_vertex(VertexRef v) {
-    (void)v;
-    return std::nullopt;
+    if(v->on_boundary()) return std::nullopt;
+
+    FaceRef f = bevel_vertex(v).value();
+
+    f = bevel_face(f).value();
+
+    VertexRef vnew = collapse_face(f).value();
+
+    
+
+    return vnew;
 }
 
 /* Note on the beveling process:
@@ -674,7 +696,7 @@ std::optional<Halfedge_Mesh::FaceRef> Halfedge_Mesh::bevel_face(Halfedge_Mesh::F
     std::vector<HalfedgeRef> itrh_vec;
     for(int i = 0; i < deg; i++) {
         itrh_vec.push_back(itrh);
-        itrh = itrh->twin()->next();
+        itrh = itrh->next();
     }
 
     // for each face neighbor to the beveled face:
@@ -694,57 +716,66 @@ std::optional<Halfedge_Mesh::FaceRef> Halfedge_Mesh::bevel_face(Halfedge_Mesh::F
         HalfedgeRef h2 = new_halfedge();
         HalfedgeRef h3 = new_halfedge();
 
+        HalfedgeRef h = itrh_vec[i];
+        HalfedgeRef ht = itrh_vec[i]->twin();
 
         // reassignment
-        fi->halfedge() = h0;
-
         h0->face() = fi;
         h1->face() = fi;
         h2->face() = fi;
         h3->face() = fi;
 
-        ei->halfedge() = h0;
-        ein->halfedge() = h3;
-        itrh_vec[i]->twin()->edge()->halfedge() = h1;
-        
+        h->face() = f;
+        f->halfedge() = h;
+
+        fi->halfedge() = h0;
+
         h3->edge() = ein;
         h0->edge() = ei;
-        h1->edge() = itrh_vec[i]->twin()->edge();
-        itrh_vec[i]->edge() = ein;
-        
-        vi->halfedge() = h0;
-        v1->halfedge() = h1;
-        vi->pos = v1->pos;
-        
+        h1->edge() = ht->edge();
+        h->edge() = ein;
+
+        ei->halfedge() = h0;
+        ein->halfedge() = h3;
+        ht->edge()->halfedge() = ht;
+
         h0->vertex() = vi;
         h1->vertex() = v1;
         h2->vertex() = v2;
-        itrh_vec[i]->vertex() = vi;
+        h->vertex() = vi;
+
+        vi->halfedge() = h0;
+        v1->halfedge() = h1;
+        v2->halfedge() = h2;
+        vi->pos = v1->pos;
         
         h0->next() = h1;
         h1->next() = h2;
         h2->next() = h3;
         h3->next() = h0;
         
-        h1->twin() = itrh_vec[i]->twin();
-        itrh_vec[i]->twin()->twin() = h1;
-        h3->twin() = itrh_vec[i];
-        itrh_vec[i]->twin() = h3;
+        h1->twin() = ht;
+        ht->twin() = h1;
+        h3->twin() = h;
+        h->twin() = h3;
 
-        ///h0->twin() old <-> new h2->twin() #
+        vi->pos = v1->pos;
+
+        ///h0->twin() old <-> new h2->twin() 
         ///h2->edge() new -> ei old
         ///h3->vertex() new -> vi old 
-        
-        
+
     }
 
-    for(int i = 0; i < deg; i++) {
-        itrh_vec[i]->twin()->next()->twin() = itrh_vec[(i - 1) % deg]->twin()->next()->next()->next();
-        itrh_vec[(i - 1) % deg]->twin()->next()->next()->next()->twin() = itrh_vec[i]->twin()->next();
+    for(size_t i = 0; i < deg; i++) {
+        size_t p = (i) ? (i - 1) : deg - 1;
+        itrh_vec[i]->twin()->next()->twin() = itrh_vec[p]->twin()->next()->next()->next();
+        itrh_vec[p]->twin()->next()->next()->next()->twin() = itrh_vec[i]->twin()->next();
     
         itrh_vec[i]->twin()->next()->next()->next()->edge() = itrh_vec[i]->next()->twin()->next()->edge();
     
         itrh_vec[i]->twin()->vertex() = itrh_vec[i]->next()->vertex();
+
     }
     
     return f;
@@ -848,16 +879,26 @@ void Halfedge_Mesh::bevel_face_positions(const std::vector<Vec3>& start_position
     if(flip_orientation) normal_offset = -normal_offset;
     std::vector<HalfedgeRef> new_halfedges;
     auto h = face->halfedge();
+    Vec3 FaceCenter(0, 0, 0);
+    int i = 0;
     do {
         new_halfedges.push_back(h);
+        FaceCenter += (start_positions[i] / (float) face->degree());
         h = h->next();
+        i++;
     } while(h != face->halfedge());
 
-    (void)new_halfedges;
-    (void)start_positions;
-    (void)face;
-    (void)tangent_offset;
-    (void)normal_offset;
+    if(tangent_offset < -0.99) tangent_offset = tangent_offset * -1 -  2;
+
+    Vec3 N = cross((new_halfedges[0]->edge()->center() - new_halfedges[1]->vertex()->pos),
+                   (new_halfedges[1]->edge()->center() - new_halfedges[1]->vertex()->pos)).normalize();
+
+    for(i = 0; i < new_halfedges.size(); i++) {
+        new_halfedges[i]->vertex()->pos = start_positions[i] + 1.5f * normal_offset * N +
+                                          tangent_offset * (start_positions[i] - FaceCenter);
+    }
+
+    
 }
 
 /*
