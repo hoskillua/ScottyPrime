@@ -704,6 +704,11 @@ std::string Model::UIsidebar(Undo& undo, Widgets& widgets, Scene_Maybe obj_opt, 
         return update_mesh_global(undo, obj, std::move(before),
                                   [](Halfedge_Mesh& m) { return m.subdivide(SubD::loop); });
     }
+    if(Manager::wrap_button("Linear-Loop")) {
+        mesh.copy_to(before);
+        return update_mesh_global(undo, obj, std::move(before),
+                                  [](Halfedge_Mesh& m) { return m.subdivide(SubD::linearloop); });
+    }
     if(ImGui::Button("Triangulate")) {
         mesh.copy_to(before);
         return update_mesh_global(undo, obj, std::move(before), [](Halfedge_Mesh& m) {

@@ -570,9 +570,18 @@ bool Halfedge_Mesh::subdivide(SubD strategy) {
         for(FaceRef f = faces_begin(); f != faces_end(); f++) {
             if(f->degree() != 3) return false;
         }
-        loop_subdivide();
+        loop_subdivide(false);
         return true;
     } break;
+    case SubD::linearloop: {
+        if(has_boundary()) return false;
+        for(FaceRef f = faces_begin(); f != faces_end(); f++) {
+            if(f->degree() != 3) return false;
+        }
+        loop_subdivide(true);
+        return true;
+    }
+        break;
 
     default: assert(false);
     }

@@ -137,7 +137,7 @@
 #include "../platform/gl.h"
 
 // Types of sub-division
-enum class SubD { linear, catmullclark, loop };
+enum class SubD { linear, catmullclark, loop, linearloop };
 
 class Halfedge_Mesh {
 public:
@@ -343,7 +343,7 @@ public:
     /*
         Sub-divide each face based on the Loop subdivision rule
     */
-    void loop_subdivide();
+    void loop_subdivide(bool linear);
 
     /*
         Isotropic remeshing

@@ -1203,8 +1203,54 @@ void Halfedge_Mesh::catmullclark_subdivide_positions() {
 /*
     This routine should increase the number of triangles in the mesh
     using Loop subdivision. Note: this is will only be called on triangle meshes.
+    if "linear" is true, loop subdivision only affects connectiviy (like Linear vs Catmull-clark)
 */
-void Halfedge_Mesh::loop_subdivide() {
+void Halfedge_Mesh::loop_subdivide(bool linear) {
+
+    for(std::list<Vertex>::iterator v = vertices.begin(); v != vertices.end(); ++v) {
+        v->is_new = false;
+        if(!linear) {
+            size_t deg = v->degree();
+            float u = (deg == 3) ? 3.0f / 16 : 3.0f / (8 * deg);
+            Vec3 Usum(0);
+            HalfedgeRef itrh = v->halfedge();
+            do {
+                Usum += (itrh->twin()->vertex()->pos) * (u);
+                itrh = itrh->twin()->next();
+            } while(itrh != v->halfedge());
+
+            v->new_pos = (1 - deg * u) * v->pos + Usum;
+        }
+    }
+    
+    for(std::list<Edge>::iterator e = edges.begin(); e != edges.end(); ++e) {
+        e->is_new = false;
+        if(!linear) {
+            Vec3 opposite = (e->halfedge()->next()->next()->vertex()->pos +
+                             e->halfedge()->twin()->next()->next()->vertex()->pos) /
+                            2.0f;
+            e->new_pos = e->center() * 0.75f + (opposite)*0.25f;
+        }
+    }
+
+    for(std::list<Edge>::iterator e = edges.begin(); e != edges.end(); ++e) {
+        if(!(e->is_new) && !(e->halfedge()->vertex()->is_new) && !(e->halfedge()->twin()->vertex()->is_new)) {
+            VertexRef v = split_edge(e).value();
+            v->new_pos = e->new_pos;
+        }
+    }
+
+    for(std::list<Edge>::iterator e = edges.begin(); e != edges.end(); ++e) {
+        if(e->is_new && !(e->halfedge()->vertex()->is_new && e->halfedge()->twin()->vertex()->is_new))
+            flip_edge(e);
+    }
+
+    if(!linear)
+        for(std::list<Vertex>::iterator v = vertices.begin(); v != vertices.end(); ++v) {
+            v->pos = v->new_pos;
+        }
+
+
 
     // Each vertex and edge of the original mesh can be associated with a
     // vertex in the new (subdivided) mesh.

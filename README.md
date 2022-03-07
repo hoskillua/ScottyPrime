@@ -33,3 +33,17 @@ below are some examples of the implemented local operations.
 |         Erase          | ![img](docs/assets/1646624580973.png) | ![1646661857982.png](docs/assets/1646661857982.png) |
 |         Bevel          |  ![](docs/assets/1646624607677.png)   | ![1646661687204.png](docs/assets/1646661687204.png) |
 |        Extrude         |  ![](docs/assets/1646624544469.png)   | ![1646661852233.png](docs/assets/1646661852233.png) |
+
+### Global operations
+
+below are some examples of the implemented global operations.
+
+|                                     Global<br />Operations                                      |                    Illustration                     |                    GIF from App                     |
+| :---------------------------------------------------------------------------------------------: | :-------------------------------------------------: | :-------------------------------------------------: |
+|                                          Triangulation                                          | ![1646663940030.png](docs/assets/1646663940030.png) | ![1646678071919.png](docs/assets/1646678071919.png) |
+|                                     Linear<br />Subdivision                                     |        ![img](docs/assets/1646663771162.png)        | ![1646678078967.png](docs/assets/1646678078967.png) |
+|                                 Catmull-Clark<br />Subdivision                                  |        ![img](docs/assets/1646665295561.png)        | ![1646678100932.png](docs/assets/1646678100932.png) |
+|                                  Linear Loop<br />Subdivision                                   |        ![img](docs/assets/1646663748796.png)        | ![1646678155605.png](docs/assets/1646678155605.png) |
+|                                      Loop<br />Subdivision                                      |        ![img](docs/assets/1646674586052.png)        | ![1646678301667.png](docs/assets/1646678301667.png) |
+|     [Isotropic Remeshing](https://www.graphics.rwth-aachen.de/media/papers/remeshing1.pdf)      |        ![img](docs/assets/1646675219732.png)        |                Yet to be Implemented                |
+| [Quadratic<br /> Error Simplification](http://www.cs.cmu.edu/~./garland/quadrics/quadrics.html) |        ![img](docs/assets/1646675099883.png)        |                Yet to be Implemented                |
