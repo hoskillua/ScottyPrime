@@ -672,8 +672,63 @@ std::optional<Halfedge_Mesh::FaceRef> Halfedge_Mesh::bevel_edge(Halfedge_Mesh::E
     // Reminder: You should set the positions of new vertices (v->pos) to be exactly
     // the same as wherever they "started from."
     
-    (void)e;
-    return std::nullopt;
+    if(e->on_boundary()) return std::nullopt;
+
+    HalfedgeRef h = e->halfedge();
+    HalfedgeRef ht = e->halfedge()->twin();
+
+    FaceRef f = h->face();
+    FaceRef ft = ht->face();
+
+    VertexRef v = h->vertex();
+    VertexRef vt = ht->vertex();
+
+
+    //FaceRef f = bevel_vertex(v).value();
+    //FaceRef ft = bevel_vertex(vt).value();
+
+    VertexRef v0 = h->next()->next()->vertex();
+    VertexRef v1 = ht->next()->twin()->next()->next()->vertex();
+    VertexRef v2 = ht->next()->next()->vertex();
+    VertexRef v3 = h->next()->twin()->next()->next()->vertex();
+
+    HalfedgeRef h0 = new_halfedge();
+    HalfedgeRef h1 = new_halfedge();
+    HalfedgeRef h2 = new_halfedge();
+    HalfedgeRef h3 = new_halfedge();
+
+    EdgeRef e01 = new_edge();
+    EdgeRef e23 = new_edge();
+
+    v0->halfedge() = h0; 
+    v1->halfedge() = h1; 
+    v2->halfedge() = h2; 
+    v3->halfedge() = h3; 
+
+    h0->vertex() = v0;
+    h1->vertex() = v1;
+    h2->vertex() = v2;
+    h3->vertex() = v3;
+
+    e01->halfedge() = h0;
+    e23->halfedge() = h2;
+
+    h0->edge() = e01;
+    h1->edge() = e01;
+    h2->edge() = e23;
+    h3->edge() = e23;
+
+    h0->twin() = h1;
+    h1->twin() = h0;
+    h2->twin() = h3;
+    h3->twin() = h2;
+
+    h1->next() = h->next()->next();
+
+
+
+    return erase_vertex(collapse_edge(e).value());
+
 }
 
 /*
