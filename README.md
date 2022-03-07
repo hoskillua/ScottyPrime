@@ -20,16 +20,16 @@ below are some examples of the implemented local operations.
 |        Bevel         | ![](docs/assets/1646616798362.png) | ![](docs/assets/1646616204864.png) |
 |  Insert<br />Vertex  | ![](docs/assets/1646616668844.png) | ![](docs/assets/1646615787213.png) |
 
-| Edge<br />Operations |            Illustration            |     GIF from App      |
-| :------------------: | :--------------------------------: | :-------------------: |
-|       Collapse       | ![](docs/assets/1646617037475.png) |                       |
-|        Erase         | ![](docs/assets/1646617055347.png) |                       |
-|        Split         | ![](docs/assets/1646617009936.png) |                       |
-|         Flip         | ![](docs/assets/1646617003685.png) |                       |
-|        Bevel         | ![](docs/assets/1646617079322.png) | Yet to be Implemented |
+| Edge<br />Operations |            Illustration            |                                                                  GIF from App                                                                  |
+| :------------------: | :--------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------: |
+|       Collapse       | ![](docs/assets/1646617037475.png) |                                              ![1646662692294.png](image/README/1646662692294.png)                                              |
+|        Erase         | ![](docs/assets/1646617055347.png) |                                              ![1646662687866.png](image/README/1646662687866.png)                                              |
+|        Split         | ![](docs/assets/1646617009936.png) | ![1646662664993.png](https://file+.vscode-resource.vscode-webview.net/d%3A/3A/CG/Projs/ScottyPrime/ScottyPrime/image/README/1646662664993.png) |
+|         Flip         | ![](docs/assets/1646617003685.png) | ![1646662676129.png](https://file+.vscode-resource.vscode-webview.net/d%3A/3A/CG/Projs/ScottyPrime/ScottyPrime/image/README/1646662676129.png) |
+|        Bevel         | ![](docs/assets/1646617079322.png) |                                                             Yet to be Implemented                                                              |
 
-| Vertex<br />Operations |            Illustration            |     GIF from App      |
-| :--------------------: | :--------------------------------: | :-------------------: |
-|         Erase          | ![](docs/assets/1646624580973.png) |                       |
-|         Bevel          | ![](docs/assets/1646624607677.png) |                       |
-|        Extrude         | ![](docs/assets/1646624544469.png) | Yet to be Implemented |
+| Vertex<br />Operations |             Illustration              |                     GIF from App                     |
+| :--------------------: | :-----------------------------------: | :--------------------------------------------------: |
+|         Erase          | ![img](docs/assets/1646624580973.png) | ![1646661857982.png](image/README/1646661857982.png) |
+|         Bevel          |  ![](docs/assets/1646624607677.png)   | ![1646661687204.png](image/README/1646661687204.png) |
+|        Extrude         |  ![](docs/assets/1646624544469.png)   | ![1646661852233.png](image/README/1646661852233.png) |
