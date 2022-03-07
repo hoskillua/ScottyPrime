@@ -14,18 +14,24 @@ This part of the applicaton provides the user with wide toolkit of modeling oper
 
 below are some examples of the implemented local operations.
 
-| Face<br />Operations |             Illustration             |                                                                 GIF from App                                                                 |
-| :------------------: | :----------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------: |
-|       Collapse       | ![img](docs/assets/1646616712209.png) |                                              ![1646615804073.png](docs/assets/1646615804073.png)                                              |
-|        Inset        | ![img](docs/assets/1646616362225.png) |                                              ![1646616258814.png](docs/assets/1646616258814.png)                                              |
-|       Extrude       |  ![](docs/assets/1646616780603.png)  |                                              ![1646616245251.png](docs/assets/1646616245251.png)                                              |
-|        Bevel        |  ![](docs/assets/1646616798362.png)  | ![1646616204864.png](docs/assets/1646616204864.png) |
-|  Insert<br />Vertex  | ![img](docs/assets/1646616668844.png) | ![1646615787213.png](docs/assets/1646615787213.png) |
+| Face<br />Operations |            Illustration            |            GIF from App            |
+| :------------------: | :--------------------------------: | :--------------------------------: |
+|       Collapse       | ![](docs/assets/1646616712209.png) | ![](docs/assets/1646615804073.png) |
+|        Inset         | ![](docs/assets/1646616362225.png) | ![](docs/assets/1646616258814.png) |
+|       Extrude        | ![](docs/assets/1646616780603.png) | ![](docs/assets/1646616245251.png) |
+|        Bevel         | ![](docs/assets/1646616798362.png) | ![](docs/assets/1646616204864.png) |
+|  Insert<br />Vertex  | ![](docs/assets/1646616668844.png) | ![](docs/assets/1646615787213.png) |
 
-| Edge<br />Operations |             Illustration             |     GIF from App     |
-| :------------------: | :----------------------------------: | :-------------------: |
-|       Collapse       | ![img](docs/assets/1646617037475.png) |                      |
-|        Erase        | ![img](docs/assets/1646617055347.png) |                      |
-|        Split        | ![img](docs/assets/1646617009936.png) |                      |
-|         Flip         | ![img](docs/assets/1646617003685.png) |                      |
-|        Bevel        | ![img](docs/assets/1646617079322.png) | Yet to be Implemented |
+| Edge<br />Operations |            Illustration            |     GIF from App      |
+| :------------------: | :--------------------------------: | :-------------------: |
+|       Collapse       | ![](docs/assets/1646617037475.png) |                       |
+|        Erase         | ![](docs/assets/1646617055347.png) |                       |
+|        Split         | ![](docs/assets/1646617009936.png) |                       |
+|         Flip         | ![](docs/assets/1646617003685.png) |                       |
+|        Bevel         | ![](docs/assets/1646617079322.png) | Yet to be Implemented |
+
+| Vertex<br />Operations |            Illustration            |     GIF from App      |
+| :--------------------: | :--------------------------------: | :-------------------: |
+|         Erase          | ![](docs/assets/1646624580973.png) |                       |
+|         Bevel          | ![](docs/assets/1646624607677.png) |                       |
+|        Extrude         | ![](docs/assets/1646624544469.png) | Yet to be Implemented |

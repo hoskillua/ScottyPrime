@@ -525,11 +525,14 @@ std::optional<Halfedge_Mesh::VertexRef> Halfedge_Mesh::extrude_vertex(VertexRef 
     if(v->on_boundary()) return std::nullopt;
 
     FaceRef f = bevel_vertex(v).value();
+    
+    std::vector<Vec3> V(f->degree(), v->pos);
+
+    bevel_vertex_positions( V, f, 0.667f);
 
     f = bevel_face(f).value();
 
     VertexRef vnew = collapse_face(f).value();
-
     
 
     return vnew;
