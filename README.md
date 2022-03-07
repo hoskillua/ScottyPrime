@@ -2,15 +2,13 @@
 
 Welcome to ScottyPrime! This 3D graphics software package includes components for interactive mesh editing, realistic path tracing, and dynamic animation. It is built on a code skeleton provided by [cmu&#39;s computer graphics course](http://15462.courses.cs.cmu.edu/fall2021/).
 
-You can visit cmu's [documentation websithere](https://cmu-graphics.github.io/Scotty3D/).
+You can visit cmu's [documentation website here](https://cmu-graphics.github.io/Scotty3D/).
 
-## Results
-
-### Mesh Editing
+## Mesh Editor
 
 This part of the applicaton provides the user with wide toolkit of modeling operations. What I implemented was mostly on the halfedge data structure pointers reassignments (connectivity) and calculations for vertex positions (geometry).
 
-#### Local operations
+### Local operations
 
 below are some examples of the implemented local operations.
 
