@@ -99,7 +99,6 @@ std::optional<Halfedge_Mesh::VertexRef> Halfedge_Mesh::bisect_edge(EdgeRef e) {
     edges and faces with a single face, returning the new face.
  */
 std::optional<Halfedge_Mesh::FaceRef> Halfedge_Mesh::erase_vertex(Halfedge_Mesh::VertexRef v) {
-    /// TODO: Deal with some of the boundary cases
     if(v->on_boundary()) return std::nullopt;
 
     HalfedgeRef h = v->halfedge();
@@ -159,8 +158,6 @@ std::optional<Halfedge_Mesh::FaceRef> Halfedge_Mesh::erase_vertex(Halfedge_Mesh:
 
     return totf;
 
-    /// TODO:
-    /// Deal with degenerate face (multiple loops of edges/vertices)
 }
 
 /*
@@ -168,8 +165,6 @@ std::optional<Halfedge_Mesh::FaceRef> Halfedge_Mesh::erase_vertex(Halfedge_Mesh:
     merged face.
  */
 std::optional<Halfedge_Mesh::FaceRef> Halfedge_Mesh::erase_edge(Halfedge_Mesh::EdgeRef e) {
-    /// TODO: Deal with some of the boundary cases
-    /// TODO: If degree of one of the vertices is one: we remove the edge but without merging faces
     if(e->on_boundary()) return std::nullopt;
 
     // getting half edge, its twin and their nexts and prevs
@@ -208,8 +203,6 @@ std::optional<Halfedge_Mesh::FaceRef> Halfedge_Mesh::erase_edge(Halfedge_Mesh::E
 
     return ht->face();
 
-    /// TODO:
-    /// Deal with degenerate face (multiple loops of edges/vertices)
 }
 
 /*
