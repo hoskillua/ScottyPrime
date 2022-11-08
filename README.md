@@ -26,7 +26,6 @@ below are some examples of the implemented local operations.
 |        Erase         | ![](docs/assets/1646617055347.png) | ![1646662687866.png](docs/assets/1646662687866.png) |
 |        Split         | ![](docs/assets/1646617009936.png) | ![1646662664993.png](docs/assets/1646662664993.png) |
 |         Flip         | ![](docs/assets/1646617003685.png) | ![1646662676129.png](docs/assets/1646662676129.png) |
-|        Bevel         | ![](docs/assets/1646617079322.png) |                Yet to be Implemented                |
 
 | Vertex<br />Operations |             Illustration              |                    GIF from App                     |
 | :--------------------: | :-----------------------------------: | :-------------------------------------------------: |
